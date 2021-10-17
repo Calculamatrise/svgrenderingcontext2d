@@ -1,9 +1,3 @@
-import Line from "./utils/Line.js";
-import Polyline from "./utils/Polyline.js";
-import Ellipse from "./utils/Ellipse.js";
-import Rect from "./utils/Rect.js";
-import Text from "./utils/Text.js";
-
 const position = {
     x: null,
     y: null
@@ -16,6 +10,9 @@ export default class {
         this.svg = svg;
     }
 
+    /**
+     * @private
+     */
     #direction = "ltr";
     get direction() {
         return this.#direction;
@@ -31,6 +28,9 @@ export default class {
         this.#direction = value;
     }
 
+    /**
+     * @private
+     */
     #fillStyle = "#000000";
     get fillStyle() {
         return this.#fillStyle;
@@ -42,6 +42,9 @@ export default class {
         this.#fillStyle = value;
     }
 
+    /**
+     * @private
+     */
     #filter = "none";
     get filter() {
         return this.#filter;
@@ -55,6 +58,9 @@ export default class {
         this.#filter = value;
     }
 
+    /**
+     * @private
+     */
     #font = "10px sans-serif";
     get font() {
         return this.#font;
@@ -67,6 +73,9 @@ export default class {
         this.#font = value;
     }
 
+    /**
+     * @private
+     */
     #globalAlpha = 1;
     get globalAlpha() {
         return this.#globalAlpha;
@@ -82,6 +91,9 @@ export default class {
         this.#globalAlpha = parseInt(value);
     }
 
+    /**
+     * @private
+     */
     #globalCompositeOperation = "source-over";
     get globalCompositeOperation() {
         return this.#globalCompositeOperation;
@@ -93,6 +105,9 @@ export default class {
         this.#globalCompositeOperation = value;
     }
 
+    /**
+     * @private
+     */
     #imageSmoothingEnabled = true;
     get imageSmoothingEnabled() {
         return this.#imageSmoothingEnabled;
@@ -104,6 +119,9 @@ export default class {
         this.#imageSmoothingEnabled = value;
     }
 
+    /**
+     * @private
+     */
     #imageSmoothingQuality = "low";
     get imageSmoothingQuality() {
         return this.#imageSmoothingQuality;
@@ -115,6 +133,9 @@ export default class {
         this.#imageSmoothingQuality = value;
     }
 
+    /**
+     * @private
+     */
     #lineCap = "butt";
     get lineCap() {
         return this.#lineCap;
@@ -126,6 +147,15 @@ export default class {
         this.#lineCap = value;
     }
 
+    /**
+     * @private
+     * @protected
+     */
+    #lineDash = [];
+
+    /**
+     * @private
+     */
     #lineDashOffset = 0;
     get lineDashOffset() {
         return this.#lineDashOffset;
@@ -137,6 +167,9 @@ export default class {
         this.#lineDashOffset = value;
     }
 
+    /**
+     * @private
+     */
     #lineJoin = "miter";
     get lineJoin() {
         return this.#lineJoin;
@@ -148,6 +181,9 @@ export default class {
         this.#lineJoin = value;
     }
 
+    /**
+     * @private
+     */
     #lineWidth = 1;
     get lineWidth() {
         return this.#lineWidth;
@@ -159,6 +195,9 @@ export default class {
         this.#lineWidth = value;
     }
 
+    /**
+     * @private
+     */
     #miterLimit = 10;
     get miterLimit() {
         return this.#miterLimit;
@@ -170,6 +209,9 @@ export default class {
         this.#miterLimit = value;
     }
 
+    /**
+     * @private
+     */
     #shadowBlur = 0;
     get shadowBlur() {
         return this.#shadowBlur;
@@ -181,6 +223,9 @@ export default class {
         this.#shadowBlur = value;
     }
 
+    /**
+     * @private
+     */
     #shadowColor = "rgba(0, 0, 0, 0)";
     get shadowColor() {
         return this.#shadowColor;
@@ -192,6 +237,9 @@ export default class {
         this.#shadowColor = value;
     }
 
+    /**
+     * @private
+     */
     #shadowOffsetX = 0;
     get shadowOffsetX() {
         return this.#shadowOffsetX;
@@ -203,6 +251,9 @@ export default class {
         this.#shadowOffsetX = value;
     }
 
+    /**
+     * @private
+     */
     #shadowOffsetY = 0;
     get shadowOffsetY() {
         return this.#shadowOffsetY;
@@ -214,6 +265,9 @@ export default class {
         this.#shadowOffsetY = value;
     }
 
+    /**
+     * @private
+     */
     #strokeStyle = "#000000";
     get strokeStyle() {
         return this.#strokeStyle;
@@ -225,6 +279,9 @@ export default class {
         this.#strokeStyle = value;
     }
 
+    /**
+     * @private
+     */
     #textAlign = "start";
     get textAlign() {
         return this.#textAlign;
@@ -236,6 +293,9 @@ export default class {
         this.#textAlign = value;
     }
 
+    /**
+     * @private
+     */
     #textBaseline = "alphabetic";
     get textBaseline() {
         return this.#textBaseline;
@@ -252,18 +312,27 @@ export default class {
      */
     [Symbol.toStringTag] = "SVGRenderingContext2D";
 
-    arc(x, y, radius, segmentLength = 5) {
-        if (x === void 0 || isNaN(parseInt(x)) || y === void 0 || isNaN(parseInt(y)) || radius === void 0 || isNaN(parseInt(radius)) || isNaN(parseInt(segmentLength))) {
+    arc(x, y, radius, startAngle, endAngle, counterClockwise = false) {
+        if (isNaN(parseInt(x)) || isNaN(parseInt(y)) || isNaN(parseInt(radius)) || isNaN(parseInt(startAngle)) || isNaN(parseInt(endAngle))) {
             throw new Error("INVALID_VALUE");
         }
 
-        const arc = new Polyline();
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        const points = []
 
-        for (let i = 0; i <= 360; i += segmentLength) {
-            arc.addPoint(parseInt(x) + parseInt(radius) * Math.cos(i * Math.PI / 180), parseInt(y) + parseInt(radius) * Math.sin(i * Math.PI / 180))
+        for (let i = startAngle * 180 / Math.PI; i <= endAngle * 180 / Math.PI; i += 1) {
+            points.push([
+                parseInt(x) + parseInt(radius) * Math.cos(i * Math.PI / 180),
+                parseInt(y) + parseInt(radius) * Math.sin(i * Math.PI / 180)
+            ].join(" "));
         }
 
-        segments.push(arc);
+        element.style.setProperty("stroke", "none");
+        element.style.setProperty("fill", "none");
+
+        element.setAttribute("points", points.join(","));
+
+        segments.push(element);
     }
 
     arcTo(x2, y2, x3, y3, radius) {
@@ -272,25 +341,30 @@ export default class {
                 arguments.callee.call(...argument);
             }
 
-            return this;
+            return;
         }
 
         if (isNaN(parseInt(x2)) || isNaN(parseInt(y2)) || isNaN(parseInt(x3)) || isNaN(parseInt(y3)) || isNaN(parseInt(radius))) {
             throw new Error("INVALID_VALUE");
         }
 
-        const arc = new Polyline();
-        
-        const p0 = {x: position.x, y: position.y},
-            p1 = {x: x2, y: y2},
-            p2 = {x: x3, y: y3};
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        const p0 = { x: position.x, y: position.y }
+        const p1 = { x: x2, y: y2 }
+        const p2 = { x: x3, y: y3 }
+        const points = []
 
-        for (let i = 0; i < 1; i += 1 / 10) {
+        for (let i = 0; i < 1.01; i += 1 / 100) {
             console.log(Math.pow((1 - i), 2) * p0.x + (2 * (1 - i) * i * p1.x) + Math.pow(i, 2) * p2.x)
-            arc.addPoint(Math.pow((1 - i), 2) * p0.x + (2 * (1 - i) * i * p1.x) + Math.pow(i, 2) * p2.x, Math.pow((1 - i), 2) * p0.y + 2 * (1 - i) * i * p1.y + Math.pow(i, 2) * p2.y);
+            points.push(Math.pow((1 - i), 2) * p0.x + (2 * (1 - i) * i * p1.x) + Math.pow(i, 2) * p2.x, Math.pow((1 - i), 2) * p0.y + 2 * (1 - i) * i * p1.y + Math.pow(i, 2) * p2.y);
         }
 
-        segments.push(arc);
+        element.style.setProperty("stroke", "none");
+        element.style.setProperty("fill", "none");
+
+        element.setAttribute("points", points.join(","));
+
+        segments.push(element);
     }
 
     beginPath() {
@@ -306,21 +380,21 @@ export default class {
                 arguments.callee.call(...argument);
             }
 
-            return this;
+            return;
         }
 
         if (isNaN(parseInt(x2)) || isNaN(parseInt(y2)) || isNaN(parseInt(x3)) || isNaN(parseInt(y3)) || isNaN(parseInt(x4)) || isNaN(parseInt(y4))) {
             throw new Error("INVALID_VALUE");
         }
 
-        const bezierCurve = new Polyline();
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        const p0 = { x: position.x, y: position.y }
+        const p1 = { x: x2, y: y2 }
+        const p2 = { x: x3, y: y3 }
+        const p3 = { x: x4, y: y4 }
+        const points = []
 
-        let p0 = { x: position.x, y: position.y },
-            p1 = { x: x2, y: y2 },
-            p2 = { x: x3, y: y3 },
-            p3 = { x: x4, y: y4 };
-
-        for (let i = 0, cX, bX, aX, cY, bY, aY; i < 1; i += 1 / 10) {
+        for (let i = 0, cX, bX, aX, cY, bY, aY; i < 1.01; i += 1 / 100) {
             cX = 3 * (p1.x - p0.x);
             bX = 3 * (p2.x - p1.x) - cX;
             aX = p3.x - p0.x - cX - bX;
@@ -329,10 +403,18 @@ export default class {
             bY = 3 * (p2.y - p1.y) - cY;
             aY = p3.y - p0.y - cY - bY;
             
-            bezierCurve.addPoint((aX * Math.pow(i, 3)) + (bX * Math.pow(i, 2)) + (cX * i) + p0.x, (aY * Math.pow(i, 3)) + (bY * Math.pow(i, 2)) + (cY * i) + p0.y);
+            points.push([
+                (aX * Math.pow(i, 3)) + (bX * Math.pow(i, 2)) + (cX * i) + p0.x,
+                (aY * Math.pow(i, 3)) + (bY * Math.pow(i, 2)) + (cY * i) + p0.y
+            ].join(" "));
         }
 
-        segments.push(bezierCurve);
+        element.style.setProperty("stroke", "none");
+        element.style.setProperty("fill", "none");
+
+        element.setAttribute("points", points.join(","));
+
+        segments.push(element);
     }
 
     clearRect(x, y, width, height) {
@@ -359,58 +441,57 @@ export default class {
 
     drawImage() {}
 
-    ellipse(x, y, rx, ry) {
-        const ellipse = new Ellipse();
+    ellipse(x, y, radiusX, radiusY, rotation) {
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+        
+        element.style.setProperty("stroke", "none");
+        element.style.setProperty("fill", "none");
+        
+        element.setAttribute("cx", parseInt(x));
+        element.setAttribute("cy", parseInt(y));
+        element.setAttribute("rx", parseInt(radiusX));
+        element.setAttribute("ry", parseInt(radiusY));
+        element.setAttribute("transform", "rotate(" + (rotation * 180 / Math.PI) + ") translate(" + (rotation * 180 / Math.PI) + " -" + (rotation * 180 / Math.PI) * 2 + ")");
 
-        ellipse.x = parseInt(x);
-        ellipse.y = parseInt(y);
-        ellipse.rx = parseInt(rx);
-        ellipse.ry = parseInt(ry);
-
-        segments.push(ellipse);
+        segments.push(element);
     }
 
     fill() {        
         segments.forEach((segment) => {
-            const element = segment.toSVG();
-
-            element.style.setProperty("fill", this.fillStyle);
-            if (element.hasOwnProperty("parentElement")) {
+            segment.style.setProperty("fill", this.fillStyle);
+            if (segment.hasOwnProperty("parentElement")) {
                 return;
             }
             
-            this.svg.appendChild(element);
+            this.svg.appendChild(segment);
         });
     }
 
     fillRect(x, y, width, height) {
-        const rect = new Rect();
-
-        rect.x = parseInt(x);
-        rect.y = parseInt(y);
-        rect.width = parseInt(width);
-        rect.height = parseInt(height);
-
-        const element = rect.toSVG();
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 
         element.style.setProperty("fill", this.fillStyle);
-        element.style.setProperty("stroke-width", this.lineWidth);
+
+        element.setAttribute("x", x);
+        element.setAttribute("y", y);
+        element.setAttribute("width", width);
+        element.setAttribute("height", height);
 
         this.svg.appendChild(element);
     }
 
     fillText(content, x, y) {
-        const text = new Text();
-
-        text.x = parseInt(x);
-        text.y = parseInt(y);
-        text.content = content;
-
-        const element = text.toSVG();
-
-        element.style.setProperty("font", this.font);
-        element.style.setProperty("fill", this.fillStyle);
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        
         element.style.setProperty("stroke-width", this.lineWidth);
+        element.style.setProperty("stroke", "none");
+        element.style.setProperty("fill", this.fillStyle);
+        element.style.setProperty("font", this.font);
+
+        element.setAttribute("x", x);
+        element.setAttribute("y", y);
+
+        element.innerHTML = content;
 
         this.svg.appendChild(element);
     }
@@ -419,7 +500,9 @@ export default class {
 
     getImageData() {}
 
-    getLineDash() {}
+    getLineDash() {
+        return this.#lineDash.split(/\s+/g);
+    }
 
     getTransform() {}
 
@@ -428,11 +511,16 @@ export default class {
     isPointInStroke() {}
 
     lineTo(x, y) {
-        const line = new Line();
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        
+        element.style.setProperty("stroke", "none");
+        
+        element.setAttribute("x1", position.x);
+        element.setAttribute("y1", position.y);
+        element.setAttribute("x2", position.x = x);
+        element.setAttribute("y2", position.y = y);
 
-        line.setPoints(position.x, position.y, position.x = x, position.y = y);
-
-        segments.push(line);
+        segments.push(element);
     }
 
     measureText(text) {
@@ -453,17 +541,52 @@ export default class {
         this.svg;
     }
 
-    quadraticCurveTo() {}    
+    quadraticCurveTo(cpx, cpy, x, y) {
+        if (Array.isArray(arguments[0])) {
+            for (const argument of arguments) {
+                this.quadraticCurveTo(...argument);
+            }
+
+            return;
+        }
+
+        if (isNaN(parseInt(cpx)) || isNaN(parseInt(cpy)) || isNaN(parseInt(x)) || isNaN(parseInt(y))) {
+            throw new Error("INVALID_VALUE");
+        }
+
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        const p0 = { x: position.x, y: position.y }
+        const p1 = { x: cpx, y: cpy }
+        const p2 = { x: x, y: y }
+        const points = []
+
+        for (let i = 0; i < 1; i += 1 / 10) {
+            points.push([
+                position.x = Math.pow((1 - i), 2) * p0.x + 2 * (1 - i) * i * p1.x + Math.pow(i, 2) * p2.x,
+                position.y = Math.pow((1 - i), 2) * p0.y + 2 * (1 - i) * i * p1.y + Math.pow(i, 2) * p2.y
+            ].join(" "));
+        }
+
+        element.style.setProperty("stroke", "none");
+        element.style.setProperty("fill", "none");
+
+        element.setAttribute("points", points.join(","));
+
+        segments.push(element);
+    }
 
     rect(x, y, width, height) {
-        const rect = new Rect();
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 
-        rect.x = parseInt(x);
-        rect.y = parseInt(y);
-        rect.width = parseInt(width);
-        rect.height = parseInt(height);
+        element.style.setProperty("stroke", "none");
+        element.style.setProperty("fill", "none");
 
-        segments.push(rect);
+        element.setAttribute("x", x);
+        element.setAttribute("y", y);
+        element.setAttribute("width", width);
+        element.setAttribute("height", height);
+
+        segments.push(element);
     }
 
     resetTransform() {}
@@ -476,52 +599,56 @@ export default class {
 
     scale() {}
 
-    setLineDash() {}
+    setLineDash(...args) {
+        this.#lineDash = args.join(" ");
+    }
 
     setTransform() {}
 
     stroke() {
         segments.forEach((segment) => {
-            const element = segment.toSVG();
-
-            element.style.setProperty("stroke", this.strokeStyle);
-            element.style.setProperty("stroke-width", this.lineWidth);
-            if (element.hasOwnProperty("parentElement")) {
+            segment.style.setProperty("stroke", this.strokeStyle);
+            segment.style.setProperty("stroke-dasharray", this.#lineDash);
+            segment.style.setProperty("stroke-linecap", this.lineCap);
+            segment.style.setProperty("stroke-linejoin", this.lineJoin);
+            segment.style.setProperty("stroke-width", this.lineWidth);
+            if (segment.hasOwnProperty("parentElement")) {
                 return;
             }
             
-            this.svg.appendChild(element);
+            this.svg.appendChild(segment);
         });
     }
 
     strokeRect(x, y, width, height) {
-        const rect = new Rect();
-
-        rect.x = parseInt(x);
-        rect.y = parseInt(y);
-        rect.width = parseInt(width);
-        rect.height = parseInt(height);
-
-        const element = rect.toSVG();
-
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        
         element.style.setProperty("stroke", this.strokeStyle);
+        element.style.setProperty("stroke-linecap", this.lineCap);
+        element.style.setProperty("stroke-linejoin", this.lineJoin);
         element.style.setProperty("stroke-width", this.lineWidth);
+        element.style.setProperty("fill", "none");
+
+        element.setAttribute("x", x);
+        element.setAttribute("y", y);
+        element.setAttribute("width", width);
+        element.setAttribute("height", height);
 
         this.svg.appendChild(element);
     }
 
     strokeText(content, x, y) {
-        const text = new Text();
-
-        text.x = parseInt(x);
-        text.y = parseInt(y);
-        text.content = content;
-
-        const element = text.toSVG();
-
-        element.style.setProperty("font", this.font);
-        element.style.setProperty("stroke", this.strokeStyle);
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        
         element.style.setProperty("stroke-width", this.lineWidth);
+        element.style.setProperty("stroke", this.strokeStyle);
+        element.style.setProperty("fill", "none");
+        element.style.setProperty("font", this.font);
+
+        element.setAttribute("x", x);
+        element.setAttribute("y", y);
+
+        element.innerHTML = content;
 
         this.svg.appendChild(element);
     }
