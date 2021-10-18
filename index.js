@@ -90,11 +90,11 @@ export default class {
      * @param {number} value
      */
     set globalAlpha(value) {
-        if (isNaN(parseInt(value))) {
+        if (isNaN(parseFloat(value))) {
             throw new Error("NaN");
         }
 
-        this.#globalAlpha = parseInt(value);
+        this.#globalAlpha = parseFloat(value);
     }
 
     /**
@@ -330,7 +330,7 @@ export default class {
                 continue;
             }
             
-            if (isNaN(parseInt(argument))) {
+            if (isNaN(parseFloat(argument))) {
                 throw new Error("INVALID_VALUE");
             }
         }
@@ -339,17 +339,17 @@ export default class {
         const points = []
 
         if (counterClockwise) {
-            for (let i = 360 - parseInt(startAngle) * 180 / Math.PI; i > Math.min(parseInt(endAngle) * 180 / Math.PI, 360); i--) {
+            for (let i = 360 - parseFloat(startAngle) * 180 / Math.PI; i > Math.min(parseFloat(endAngle) * 180 / Math.PI, 360); i--) {
                 points.push([
-                    parseInt(x) + parseInt(radius) * Math.cos(i * Math.PI / 180),
-                    parseInt(y) + parseInt(radius) * Math.sin(i * Math.PI / 180)
+                    parseFloat(x) + parseFloat(radius) * Math.cos(i * Math.PI / 180),
+                    parseFloat(y) + parseFloat(radius) * Math.sin(i * Math.PI / 180)
                 ].join(" "));
             }
         } else {
-            for (let i = parseInt(startAngle) * 180 / Math.PI; i <= Math.min(parseInt(endAngle) * 180 / Math.PI, 360); i++) {
+            for (let i = parseFloat(startAngle) * 180 / Math.PI; i <= Math.min(parseFloat(endAngle) * 180 / Math.PI, 360); i++) {
                 points.push([
-                    parseInt(x) + parseInt(radius) * Math.cos(i * Math.PI / 180),
-                    parseInt(y) + parseInt(radius) * Math.sin(i * Math.PI / 180)
+                    parseFloat(x) + parseFloat(radius) * Math.cos(i * Math.PI / 180),
+                    parseFloat(y) + parseFloat(radius) * Math.sin(i * Math.PI / 180)
                 ].join(" "));
             }
         }
@@ -373,15 +373,15 @@ export default class {
         }
 
         for (const argument of arguments) {
-            if (isNaN(parseInt(argument))) {
+            if (isNaN(parseFloat(argument))) {
                 throw new Error("INVALID_VALUE");
             }
         }
 
         const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-        const p0 = { x: position.x + (cpx - position.x) - parseInt(radius), y: position.y }
+        const p0 = { x: position.x + (cpx - position.x) - parseFloat(radius), y: position.y }
         const p1 = { x: cpx, y: cpy }
-        const p2 = { x: x, y: y + (cpy - y) + parseInt(radius) }
+        const p2 = { x: x, y: y + (cpy - y) + parseFloat(radius) }
         const points = [
             [
                 position.x,
@@ -422,7 +422,7 @@ export default class {
         }
 
         for (const argument of arguments) {
-            if (isNaN(parseInt(argument))) {
+            if (isNaN(parseFloat(argument))) {
                 throw new Error("INVALID_VALUE");
             }
         }
@@ -465,6 +465,10 @@ export default class {
     clip() {}
 
     closePath() {
+        if (initialPosition.x ?? initialPosition.y ?? true) {
+            return;
+        }
+
         this.lineTo(initialPosition.x, initialPosition.y);
     }
 
@@ -488,10 +492,10 @@ export default class {
         element.style.setProperty("stroke", "none");
         element.style.setProperty("fill", "none");
         
-        element.setAttribute("cx", parseInt(x));
-        element.setAttribute("cy", parseInt(y));
-        element.setAttribute("rx", parseInt(radiusX));
-        element.setAttribute("ry", parseInt(radiusY));
+        element.setAttribute("cx", parseFloat(x));
+        element.setAttribute("cy", parseFloat(y));
+        element.setAttribute("rx", parseFloat(radiusX));
+        element.setAttribute("ry", parseFloat(radiusY));
         element.setAttribute("transform", "rotate(" + (rotation * 180 / Math.PI) + ") translate(" + (rotation * 180 / Math.PI) + " -" + (rotation * 180 / Math.PI) * 2 + ")");
 
         segments.push(element);
@@ -554,6 +558,12 @@ export default class {
     isPointInStroke() {}
 
     lineTo(x, y) {
+        for (const argument of arguments) {
+            if (isNaN(parseFloat(argument))) {
+                throw new Error("INVALID_VALUE");
+            }
+        }
+        
         const element = document.createElementNS("http://www.w3.org/2000/svg", "line");
         
         element.style.setProperty("stroke", "none");
@@ -569,16 +579,16 @@ export default class {
 
     measureText(text) {
         return {
-            width: text.length * parseInt(this.font),
-            height: parseInt(this.font),
+            width: text.length * parseFloat(this.font),
+            height: parseFloat(this.font),
             actualBoundingBoxLeft: 0,
             actualBoundingBoxRight: 0
         }
     }
 
     moveTo(x, y) {
-        initialPosition.x = position.x = parseInt(x);
-        initialPosition.y = position.y = parseInt(y);
+        initialPosition.x = position.x = parseFloat(x);
+        initialPosition.y = position.y = parseFloat(y);
     }
 
     putImageData(data) {
@@ -595,7 +605,7 @@ export default class {
         }
 
         for (const argument of arguments) {
-            if (isNaN(parseInt(argument))) {
+            if (isNaN(parseFloat(argument))) {
                 throw new Error("INVALID_VALUE");
             }
         }
@@ -606,7 +616,7 @@ export default class {
         const p2 = { x: x, y: y }
         const points = []
 
-        for (let i = 0; i < 1.01; i += 1 / 10) {
+        for (let i = 0; i < 1.01; i += 1 / 100) {
             points.push([
                 position.x = Math.pow((1 - i), 2) * p0.x + 2 * (1 - i) * i * p1.x + Math.pow(i, 2) * p2.x,
                 position.y = Math.pow((1 - i), 2) * p0.y + 2 * (1 - i) * i * p1.y + Math.pow(i, 2) * p2.y
@@ -654,7 +664,7 @@ export default class {
                 
                 continue;
             }
-
+            
             if (cache.hasOwnProperty(property)) {
                 this[property] = cache[property];
             }
@@ -665,27 +675,27 @@ export default class {
 
     save() {
         cache = {
-            direction: this.direction,
-            fillStyle: this.fillStyle,
-            filter: this.filter,
-            font: this.font,
-            globalAlpha: this.globalAlpha,
-            globalCompositeOperation: this.globalCompositeOperation,
-            imageSmoothingEnabled: this.imageSmoothingEnabled,
-            imageSmoothingQuality: this.imageSmoothingQuality,
-            lineCap: this.lineCap,
+            direction: this.#direction,
+            fillStyle: this.#fillStyle,
+            filter: this.#filter,
+            font: this.#font,
+            globalAlpha: this.#globalAlpha,
+            globalCompositeOperation: this.#globalCompositeOperation,
+            imageSmoothingEnabled: this.#imageSmoothingEnabled,
+            imageSmoothingQuality: this.#imageSmoothingQuality,
+            lineCap: this.#lineCap,
             lineDash: this.#lineDash,
-            lineDashOffset: this.lineDashOffset,
-            lineJoin: this.lineJoin,
-            lineWidth: this.lineWidth,
-            miterLimit: this.miterLimit,
-            shadowBlur: this.shadowBlur,
-            shadowColor: this.shadowColor,
-            shadowOffsetX: this.shadowOffsetX,
-            shadowOffsetY: this.shadowOffsetY,
-            strokeStyle: this.strokeStyle,
-            textAlign: this.textAlign,
-            textBaseline: this.textBaseline,
+            lineDashOffset: this.#lineDashOffset,
+            lineJoin: this.#lineJoin,
+            lineWidth: this.#lineWidth,
+            miterLimit: this.#miterLimit,
+            shadowBlur: this.#shadowBlur,
+            shadowColor: this.#shadowColor,
+            shadowOffsetX: this.#shadowOffsetX,
+            shadowOffsetY: this.#shadowOffsetY,
+            strokeStyle: this.#strokeStyle,
+            textAlign: this.#textAlign,
+            textBaseline: this.#textBaseline,
             transform: this.#transform,
             initialPosition,
             position
@@ -710,7 +720,7 @@ export default class {
         }
 
         for (const argument of arguments) {
-            if (isNaN(parseInt(argument))) {
+            if (isNaN(parseFloat(argument))) {
                 throw new Error("INVALID_TRANSFORMATION");
             }
         }
@@ -743,10 +753,10 @@ export default class {
         element.style.setProperty("stroke-width", this.lineWidth);
         element.style.setProperty("fill", "none");
 
-        element.setAttribute("x", x);
-        element.setAttribute("y", y);
-        element.setAttribute("width", width);
-        element.setAttribute("height", height);
+        element.setAttribute("x", parseInt(x));
+        element.setAttribute("y", parseInt(y));
+        element.setAttribute("width", parseInt(width));
+        element.setAttribute("height", parseInt(height));
         element.setAttribute("transform", this.#transform);
 
         this.svg.appendChild(element);
