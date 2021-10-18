@@ -11,7 +11,7 @@ const initialPosition = {
 let segments = []
 let cache = {}
 
-export default class {
+export default class SVGRenderingContext2D {
     constructor(svg) {
         this.svg = svg;
     }
