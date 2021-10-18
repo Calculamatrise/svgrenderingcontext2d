@@ -3,7 +3,13 @@ const position = {
     y: null
 }
 
+const initialPosition = {
+    x: null,
+    y: null
+}
+
 let segments = []
+let cache = {}
 
 export default class {
     constructor(svg) {
@@ -308,22 +314,85 @@ export default class {
     }
 
     /**
+     * @private
+     * @protected
+     */
+    #transform = "";
+
+    /**
      * @readonly
      */
     [Symbol.toStringTag] = "SVGRenderingContext2D";
 
     arc(x, y, radius, startAngle, endAngle, counterClockwise = false) {
-        if (isNaN(parseInt(x)) || isNaN(parseInt(y)) || isNaN(parseInt(radius)) || isNaN(parseInt(startAngle)) || isNaN(parseInt(endAngle))) {
-            throw new Error("INVALID_VALUE");
+        for (const argument of arguments) {
+            if (typeof argument === "boolean") {
+                continue;
+            }
+            
+            if (isNaN(parseInt(argument))) {
+                throw new Error("INVALID_VALUE");
+            }
         }
 
         const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
         const points = []
 
-        for (let i = startAngle * 180 / Math.PI; i <= endAngle * 180 / Math.PI; i += 1) {
+        if (counterClockwise) {
+            for (let i = 360 - parseInt(startAngle) * 180 / Math.PI; i > Math.min(parseInt(endAngle) * 180 / Math.PI, 360); i--) {
+                points.push([
+                    parseInt(x) + parseInt(radius) * Math.cos(i * Math.PI / 180),
+                    parseInt(y) + parseInt(radius) * Math.sin(i * Math.PI / 180)
+                ].join(" "));
+            }
+        } else {
+            for (let i = parseInt(startAngle) * 180 / Math.PI; i <= Math.min(parseInt(endAngle) * 180 / Math.PI, 360); i++) {
+                points.push([
+                    parseInt(x) + parseInt(radius) * Math.cos(i * Math.PI / 180),
+                    parseInt(y) + parseInt(radius) * Math.sin(i * Math.PI / 180)
+                ].join(" "));
+            }
+        }
+
+        element.style.setProperty("stroke", "none");
+        element.style.setProperty("fill", "none");
+
+        element.setAttribute("points", points.join(","));
+        element.setAttribute("transform", this.#transform);
+
+        segments.push(element);
+    }
+
+    arcTo(cpx, cpy, x, y, radius) {
+        if (Array.isArray(arguments[0])) {
+            for (const argument of arguments) {
+                this.arcTo(...argument);
+            }
+
+            return;
+        }
+
+        for (const argument of arguments) {
+            if (isNaN(parseInt(argument))) {
+                throw new Error("INVALID_VALUE");
+            }
+        }
+
+        const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        const p0 = { x: position.x + (cpx - position.x) - parseInt(radius), y: position.y }
+        const p1 = { x: cpx, y: cpy }
+        const p2 = { x: x, y: y + (cpy - y) + parseInt(radius) }
+        const points = [
+            [
+                position.x,
+                position.y
+            ].join(" ")
+        ]
+
+        for (let i = 0; i < 1.01; i += 1 / 100) {
             points.push([
-                parseInt(x) + parseInt(radius) * Math.cos(i * Math.PI / 180),
-                parseInt(y) + parseInt(radius) * Math.sin(i * Math.PI / 180)
+                position.x = Math.pow((1 - i), 2) * p0.x + 2 * (1 - i) * i * p1.x + Math.pow(i, 2) * p2.x,
+                position.y = Math.pow((1 - i), 2) * p0.y + 2 * (1 - i) * i * p1.y + Math.pow(i, 2) * p2.y
             ].join(" "));
         }
 
@@ -331,38 +400,7 @@ export default class {
         element.style.setProperty("fill", "none");
 
         element.setAttribute("points", points.join(","));
-
-        segments.push(element);
-    }
-
-    arcTo(x2, y2, x3, y3, radius) {
-        if (Array.isArray(arguments[0])) {
-            for (const argument of arguments) {
-                arguments.callee.call(...argument);
-            }
-
-            return;
-        }
-
-        if (isNaN(parseInt(x2)) || isNaN(parseInt(y2)) || isNaN(parseInt(x3)) || isNaN(parseInt(y3)) || isNaN(parseInt(radius))) {
-            throw new Error("INVALID_VALUE");
-        }
-
-        const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-        const p0 = { x: position.x, y: position.y }
-        const p1 = { x: x2, y: y2 }
-        const p2 = { x: x3, y: y3 }
-        const points = []
-
-        for (let i = 0; i < 1.01; i += 1 / 100) {
-            console.log(Math.pow((1 - i), 2) * p0.x + (2 * (1 - i) * i * p1.x) + Math.pow(i, 2) * p2.x)
-            points.push(Math.pow((1 - i), 2) * p0.x + (2 * (1 - i) * i * p1.x) + Math.pow(i, 2) * p2.x, Math.pow((1 - i), 2) * p0.y + 2 * (1 - i) * i * p1.y + Math.pow(i, 2) * p2.y);
-        }
-
-        element.style.setProperty("stroke", "none");
-        element.style.setProperty("fill", "none");
-
-        element.setAttribute("points", points.join(","));
+        element.setAttribute("transform", this.#transform);
 
         segments.push(element);
     }
@@ -377,14 +415,16 @@ export default class {
     bezierCurveTo(x2, y2, x3, y3, x4, y4) {
         if (Array.isArray(arguments[0])) {
             for (const argument of arguments) {
-                arguments.callee.call(...argument);
+                this.bezierCurveTo(...argument);
             }
 
             return;
         }
 
-        if (isNaN(parseInt(x2)) || isNaN(parseInt(y2)) || isNaN(parseInt(x3)) || isNaN(parseInt(y3)) || isNaN(parseInt(x4)) || isNaN(parseInt(y4))) {
-            throw new Error("INVALID_VALUE");
+        for (const argument of arguments) {
+            if (isNaN(parseInt(argument))) {
+                throw new Error("INVALID_VALUE");
+            }
         }
 
         const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
@@ -404,8 +444,8 @@ export default class {
             aY = p3.y - p0.y - cY - bY;
             
             points.push([
-                (aX * Math.pow(i, 3)) + (bX * Math.pow(i, 2)) + (cX * i) + p0.x,
-                (aY * Math.pow(i, 3)) + (bY * Math.pow(i, 2)) + (cY * i) + p0.y
+                aX * Math.pow(i, 3) + bX * Math.pow(i, 2) + cX * i + p0.x,
+                aY * Math.pow(i, 3) + bY * Math.pow(i, 2) + cY * i + p0.y
             ].join(" "));
         }
 
@@ -413,6 +453,7 @@ export default class {
         element.style.setProperty("fill", "none");
 
         element.setAttribute("points", points.join(","));
+        element.setAttribute("transform", this.#transform);
 
         segments.push(element);
     }
@@ -424,7 +465,7 @@ export default class {
     clip() {}
 
     closePath() {
-        
+        this.lineTo(initialPosition.x, initialPosition.y);
     }
 
     createImageData() {
@@ -457,7 +498,7 @@ export default class {
     }
 
     fill() {        
-        segments.forEach((segment) => {
+        segments.reverse().forEach((segment) => {
             segment.style.setProperty("fill", this.fillStyle);
             if (segment.hasOwnProperty("parentElement")) {
                 return;
@@ -476,6 +517,7 @@ export default class {
         element.setAttribute("y", y);
         element.setAttribute("width", width);
         element.setAttribute("height", height);
+        element.setAttribute("transform", this.#transform);
 
         this.svg.appendChild(element);
     }
@@ -490,6 +532,7 @@ export default class {
 
         element.setAttribute("x", x);
         element.setAttribute("y", y);
+        element.setAttribute("transform", this.#transform);
 
         element.innerHTML = content;
 
@@ -519,6 +562,7 @@ export default class {
         element.setAttribute("y1", position.y);
         element.setAttribute("x2", position.x = x);
         element.setAttribute("y2", position.y = y);
+        element.setAttribute("transform", this.#transform);
 
         segments.push(element);
     }
@@ -533,8 +577,8 @@ export default class {
     }
 
     moveTo(x, y) {
-        position.x = parseInt(x);
-        position.y = parseInt(y);
+        initialPosition.x = position.x = parseInt(x);
+        initialPosition.y = position.y = parseInt(y);
     }
 
     putImageData(data) {
@@ -550,8 +594,10 @@ export default class {
             return;
         }
 
-        if (isNaN(parseInt(cpx)) || isNaN(parseInt(cpy)) || isNaN(parseInt(x)) || isNaN(parseInt(y))) {
-            throw new Error("INVALID_VALUE");
+        for (const argument of arguments) {
+            if (isNaN(parseInt(argument))) {
+                throw new Error("INVALID_VALUE");
+            }
         }
 
         const element = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
@@ -560,7 +606,7 @@ export default class {
         const p2 = { x: x, y: y }
         const points = []
 
-        for (let i = 0; i < 1; i += 1 / 10) {
+        for (let i = 0; i < 1.01; i += 1 / 10) {
             points.push([
                 position.x = Math.pow((1 - i), 2) * p0.x + 2 * (1 - i) * i * p1.x + Math.pow(i, 2) * p2.x,
                 position.y = Math.pow((1 - i), 2) * p0.y + 2 * (1 - i) * i * p1.y + Math.pow(i, 2) * p2.y
@@ -571,6 +617,7 @@ export default class {
         element.style.setProperty("fill", "none");
 
         element.setAttribute("points", points.join(","));
+        element.setAttribute("transform", this.#transform);
 
         segments.push(element);
     }
@@ -585,30 +632,97 @@ export default class {
         element.setAttribute("y", y);
         element.setAttribute("width", width);
         element.setAttribute("height", height);
+        element.setAttribute("transform", this.#transform);
 
         segments.push(element);
     }
 
-    resetTransform() {}
+    resetTransform() {
+        this.#transform = "";
+    }
 
-    restore() {}
+    restore() {
+        for (const property in cache) {
+            if (property === "position") {
+                position.x = cache[property].x
+                position.y = cache[property].y
+
+                continue;
+            } else if (property === "initialPosition") {
+                initialPosition.x = cache[property].x
+                initialPosition.y = cache[property].y
+                
+                continue;
+            }
+
+            if (cache.hasOwnProperty(property)) {
+                this[property] = cache[property];
+            }
+        }
+    }
 
     rotate() {}
 
-    save() {}
+    save() {
+        cache = {
+            direction: this.direction,
+            fillStyle: this.fillStyle,
+            filter: this.filter,
+            font: this.font,
+            globalAlpha: this.globalAlpha,
+            globalCompositeOperation: this.globalCompositeOperation,
+            imageSmoothingEnabled: this.imageSmoothingEnabled,
+            imageSmoothingQuality: this.imageSmoothingQuality,
+            lineCap: this.lineCap,
+            lineDash: this.#lineDash,
+            lineDashOffset: this.lineDashOffset,
+            lineJoin: this.lineJoin,
+            lineWidth: this.lineWidth,
+            miterLimit: this.miterLimit,
+            shadowBlur: this.shadowBlur,
+            shadowColor: this.shadowColor,
+            shadowOffsetX: this.shadowOffsetX,
+            shadowOffsetY: this.shadowOffsetY,
+            strokeStyle: this.strokeStyle,
+            textAlign: this.textAlign,
+            textBaseline: this.textBaseline,
+            transform: this.#transform,
+            initialPosition,
+            position
+        }
+    }
 
-    scale() {}
+    scale(x, y) {
+        // Change the viewbox
+    }
 
     setLineDash(...args) {
         this.#lineDash = args.join(" ");
     }
 
-    setTransform() {}
+    setTransform(matrix) {
+        if (typeof matrix === "string") {
+            if (!matrix.match(/^matrix(.+)$/g)) {
+                throw new Error("INVALID_TRANSFORMATION");
+            }
+
+            this.#transform = matrix;
+        }
+
+        for (const argument of arguments) {
+            if (isNaN(parseInt(argument))) {
+                throw new Error("INVALID_TRANSFORMATION");
+            }
+        }
+
+        this.#transform = "matrix(" + [...arguments].join(", ") + ")";
+    }
 
     stroke() {
-        segments.forEach((segment) => {
+        segments.reverse().forEach((segment) => {
             segment.style.setProperty("stroke", this.strokeStyle);
             segment.style.setProperty("stroke-dasharray", this.#lineDash);
+            segment.style.setProperty("stroke-dashoffset", this.lineDashOffset);
             segment.style.setProperty("stroke-linecap", this.lineCap);
             segment.style.setProperty("stroke-linejoin", this.lineJoin);
             segment.style.setProperty("stroke-width", this.lineWidth);
@@ -633,6 +747,7 @@ export default class {
         element.setAttribute("y", y);
         element.setAttribute("width", width);
         element.setAttribute("height", height);
+        element.setAttribute("transform", this.#transform);
 
         this.svg.appendChild(element);
     }

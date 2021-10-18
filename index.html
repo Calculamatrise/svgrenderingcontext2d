@@ -15,18 +15,49 @@
 
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
+        ctx.scale(2, 2);
+        ctx.save();
         ctx.beginPath();
-        ctx.arcTo(20, 0, 20, 20, 10);
-        ctx.arc(20, 20, 10, 0, 2 * Math.PI);
+        // ctx.arcTo(20, 0, 20, 20, 10);
+        ctx.arc(50, 50, 50, 0, 2);
         // ctx.ellipse(100, 100, 50, 75, Math.PI / 4, 0, 2 * Math.PI);
         // ctx.strokeText("Testing", 10, 30);
-        // ctx.fillRect(10, 20, 10, 10);
+        ctx.setTransform(1, 1, 0, 1, 0, 0);
+        ctx.rect(10, 20, 10, 10);
+        ctx.setTransform(1,0.5, -0.5, 1, 30, 10);
+        ctx.fillStyle = "blue";
+        ctx.fillRect(0, 0, 250, 100);
+        ctx.resetTransform();
         // ctx.ellipse(10,10,20,10);
         ctx.stroke();
+        ctx.restore();
 
         ctx.beginPath();
         ctx.moveTo(20, 20);
         ctx.bezierCurveTo(20, 100, 200, 100, 200, 20);
+        ctx.stroke();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(20, 20);
+        ctx.lineTo(100, 20);
+        ctx.arcTo(150, 20, 150, 70, 50);
+        ctx.lineTo(150, 120);
+        ctx.stroke();
+
+        ctx.setLineDash([4, 16]);
+
+        ctx.beginPath();
+        ctx.moveTo(0, 50);
+        ctx.lineTo(300, 50);
+        ctx.stroke();
+
+        // Dashed line with offset of 4
+        ctx.beginPath();
+        ctx.strokeStyle = 'red';
+        ctx.lineDashOffset = 4;
+        ctx.moveTo(0, 100);
+        ctx.lineTo(300, 100);
         ctx.stroke();
     </script>
 </body>
