@@ -13,52 +13,62 @@
 
         window.ctx = new SVGRenderingContext(svg);
 
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.scale(2, 2);
-        ctx.save();
-        ctx.beginPath();
-        // ctx.arcTo(20, 0, 20, 20, 10);
-        ctx.arc(50, 50, 50, 0, 2);
-        // ctx.ellipse(100, 100, 50, 75, Math.PI / 4, 0, 2 * Math.PI);
-        // ctx.strokeText("Testing", 10, 30);
-        ctx.setTransform(1, 1, 0, 1, 0, 0);
-        ctx.rect(10, 20, 10, 10);
-        ctx.setTransform(1,0.5, -0.5, 1, 30, 10);
-        ctx.fillStyle = "blue";
-        ctx.fillRect(0, 0, 250, 100);
-        ctx.resetTransform();
-        // ctx.ellipse(10,10,20,10);
-        ctx.stroke();
-        ctx.restore();
-
-        ctx.beginPath();
-        ctx.moveTo(20, 20);
-        ctx.bezierCurveTo(20, 100, 200, 100, 200, 20);
-        ctx.stroke();
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(20, 20);
-        ctx.lineTo(100, 20);
-        ctx.arcTo(150, 20, 150, 70, 50);
-        ctx.lineTo(150, 120);
-        ctx.stroke();
-
-        ctx.setLineDash([4, 16]);
-
-        ctx.beginPath();
-        ctx.moveTo(0, 50);
-        ctx.lineTo(300, 50);
-        ctx.stroke();
-
-        // Dashed line with offset of 4
-        ctx.beginPath();
-        ctx.strokeStyle = 'red';
-        ctx.lineDashOffset = 4;
-        ctx.moveTo(0, 100);
-        ctx.lineTo(300, 100);
-        ctx.stroke();
+        ctx.beginPath(),
+        ctx.strokeStyle="rgba(0,0,0,0)",
+        ctx.lineCap="butt",
+        ctx.lineJoin="miter",
+        ctx.miterLimit=4,
+        ctx.save(),
+        ctx.fillStyle="#ffffff",
+        ctx.beginPath(),
+        ctx.arc(42.4,52.5,30.3,0,6.283185307179586,!0),
+        ctx.closePath(),
+        ctx.fill(),
+        ctx.stroke(),
+        ctx.restore(),
+        ctx.save(),
+        ctx.fillStyle="white",
+        ctx.beginPath(),
+        ctx.moveTo(71.624,44.496),
+        ctx.bezierCurveTo(68.112,31.647,56.363,22.2,42.4,22.2),
+        ctx.bezierCurveTo(25.665999999999997,22.2,12.099999999999998,35.765,12.099999999999998,52.5),
+        ctx.bezierCurveTo(12.099999999999998,55.771,12.623999999999999,58.916,13.582999999999998,61.867000000000004),
+        ctx.lineTo(71.624,44.496),
+        ctx.closePath(),
+        ctx.fill(),
+        ctx.stroke(),
+        ctx.restore(),
+        ctx.save(),
+        ctx.beginPath(),
+        ctx.moveTo(42.4,22.2),
+        ctx.bezierCurveTo(59.134,22.2,72.7,35.765,72.7,52.5),
+        ctx.bezierCurveTo(72.7,69.235,59.135,82.8,42.4,82.8),
+        ctx.bezierCurveTo(25.665,82.8,12.1,69.234,12.1,52.5),
+        ctx.bezierCurveTo(12.1,35.766000000000005,25.666,22.2,42.4,22.2),
+        ctx.moveTo(42.4,15.2),
+        ctx.bezierCurveTo(21.833,15.2,5.100000000000001,31.932,5.100000000000001,52.5),
+        ctx.bezierCurveTo(5.100000000000001,73.068,21.832,89.8,42.4,89.8),
+        ctx.bezierCurveTo(62.967999999999996,89.8,79.69999999999999,73.068,79.69999999999999,52.5),
+        ctx.bezierCurveTo(79.69999999999999,31.932000000000002,62.968,15.2,42.4,15.2),
+        ctx.lineTo(42.4,15.2),
+        ctx.closePath(),
+        ctx.fill(),
+        ctx.stroke(),
+        ctx.restore(),
+        ctx.save(),
+        ctx.beginPath(),
+        ctx.moveTo(16.3,66.85),
+        ctx.bezierCurveTo(41.8,60.148999999999994,67.2,53.449999999999996,92.601,46.648999999999994),
+        ctx.bezierCurveTo(96.201,45.648999999999994,99.8,44.748999999999995,103.5,43.748999999999995),
+        ctx.bezierCurveTo(111,41.748999999999995,107.8,30.148999999999994,100.3,32.148999999999994),
+        ctx.bezierCurveTo(74.901,38.94899999999999,49.400999999999996,45.748999999999995,24,52.449),
+        ctx.bezierCurveTo(20.4,53.449,16.8,54.349,13.101,55.349),
+        ctx.bezierCurveTo(5.7,57.35,8.9,68.85,16.3,66.85),
+        ctx.lineTo(16.3,66.85),
+        ctx.closePath(),
+        ctx.fill(),
+        ctx.stroke(),
+        ctx.restore()
     </script>
 </body>
 </html>

@@ -339,17 +339,17 @@ export default class SVGRenderingContext2D {
         const points = []
 
         if (counterClockwise) {
-            for (let i = 360 - parseFloat(startAngle) * 180 / Math.PI; i > Math.min(parseFloat(endAngle) * 180 / Math.PI, 360); i--) {
+            for (let i = parseFloat(startAngle) * 180 / Math.PI % 360; i >= -360 + parseFloat(endAngle) * 180 / Math.PI % 360; i--) {
                 points.push([
-                    parseFloat(x) + parseFloat(radius) * Math.cos(i * Math.PI / 180),
-                    parseFloat(y) + parseFloat(radius) * Math.sin(i * Math.PI / 180)
+                    position.x = parseFloat(x) + parseFloat(radius) * Math.cos(i * Math.PI / 180),
+                    position.y = parseFloat(y) + parseFloat(radius) * Math.sin(i * Math.PI / 180)
                 ].join(" "));
             }
         } else {
             for (let i = parseFloat(startAngle) * 180 / Math.PI; i <= Math.min(parseFloat(endAngle) * 180 / Math.PI, 360); i++) {
                 points.push([
-                    parseFloat(x) + parseFloat(radius) * Math.cos(i * Math.PI / 180),
-                    parseFloat(y) + parseFloat(radius) * Math.sin(i * Math.PI / 180)
+                    position.x = parseFloat(x) + parseFloat(radius) * Math.cos(i * Math.PI / 180),
+                    position.y = parseFloat(y) + parseFloat(radius) * Math.sin(i * Math.PI / 180)
                 ].join(" "));
             }
         }
@@ -389,7 +389,7 @@ export default class SVGRenderingContext2D {
             ].join(" ")
         ]
 
-        for (let i = 0; i < 1.01; i += 1 / 100) {
+        for (let i = 0; i < 1.01; i += (250 / parseFloat(radius)) / 100) {
             points.push([
                 position.x = Math.pow((1 - i), 2) * p0.x + 2 * (1 - i) * i * p1.x + Math.pow(i, 2) * p2.x,
                 position.y = Math.pow((1 - i), 2) * p0.y + 2 * (1 - i) * i * p1.y + Math.pow(i, 2) * p2.y
@@ -444,8 +444,8 @@ export default class SVGRenderingContext2D {
             aY = p3.y - p0.y - cY - bY;
             
             points.push([
-                aX * Math.pow(i, 3) + bX * Math.pow(i, 2) + cX * i + p0.x,
-                aY * Math.pow(i, 3) + bY * Math.pow(i, 2) + cY * i + p0.y
+                position.x = aX * Math.pow(i, 3) + bX * Math.pow(i, 2) + cX * i + p0.x,
+                position.y = aY * Math.pow(i, 3) + bY * Math.pow(i, 2) + cY * i + p0.y
             ].join(" "));
         }
 
@@ -753,10 +753,10 @@ export default class SVGRenderingContext2D {
         element.style.setProperty("stroke-width", this.lineWidth);
         element.style.setProperty("fill", "none");
 
-        element.setAttribute("x", parseInt(x));
-        element.setAttribute("y", parseInt(y));
-        element.setAttribute("width", parseInt(width));
-        element.setAttribute("height", parseInt(height));
+        element.setAttribute("x", parseFloat(x));
+        element.setAttribute("y", parseFloat(y));
+        element.setAttribute("width", parseFloat(width));
+        element.setAttribute("height", parseFloat(height));
         element.setAttribute("transform", this.#transform);
 
         this.svg.appendChild(element);
